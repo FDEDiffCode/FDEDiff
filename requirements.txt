@@ -1,0 +1,11 @@
+einops
+matplotlib
+mkl_service
+numpy
+pandas
+PyYAML
+scikit_learn
+scipy
+tensorflow
+torch
+tqdm

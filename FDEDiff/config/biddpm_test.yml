@@ -1,0 +1,67 @@
+dataloader:
+  dataset:
+    name: "Etth"
+    data_root: "./data/csv/ETTh.csv"
+    keep_first: False
+    window: 64
+    stride: 1
+  batch_size: 128
+  dim: 7
+  task: "basic"
+
+model:
+  name: "build_biddpm"
+  common:
+    input_len: 64
+    input_dim: 7
+  encoder:
+    d_model: 128
+    num_layer: 4
+    patch_len: 1
+    n_heads: 8
+    dropout: 0.1
+  decoder:
+    num_layer: 3
+    dropout: 0.1
+    n_heads: 8
+  vq:
+    num_embedding: 64
+    commitment_cost: 1.0
+  mlp_noise:
+    hidden_dim: 768
+    timesteps: 500
+    dropout: 0.1
+  ddpm:
+    timesteps: 500
+    beta_schedule: "cosine"
+    predict_target: "x0"
+  biddpm:
+    split_threshold: 0
+    augment_alpha: 1.5
+    augment_mode: 'appended'
+exp:
+  lab_name: "biddpm_test"
+  vqvae:
+    lr: 0.001
+    max_epochs: 100
+  biddpm:
+    ddpm_lf:
+      lr: 0.0001
+      max_epochs: 500
+      save_per_epoch: 2000
+      sch:
+        warmup_steps: 100
+        final_lr: 0.002
+        base_lr: 0.0001 # equal lr 
+        patience: 15
+        warmup_ratio: 0.006
+    ddpm_hf:
+      lr: 0.0001
+      max_epochs: 500
+      save_per_epoch: 5000
+      sch:
+        warmup_steps: 100
+        final_lr: 0.002
+        base_lr: 0.0001 # equal lr 
+        patience: 15
+        warmup_ratio: 0.006
