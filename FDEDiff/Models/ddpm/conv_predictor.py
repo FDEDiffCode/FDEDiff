@@ -2,8 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from Models.ddpm.model_utils import FixedTimeEmbeddings, AdaLayerNorm_t
-
+from FDEDiff.Models.ddpm.model_utils import FixedTimeEmbeddings, AdaLayerNorm_t
 
 class ConvBlock(nn.Module):
     def __init__(

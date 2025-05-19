@@ -2,9 +2,9 @@ import torch
 import torch.nn.functional as F
 from torch.utils.data import TensorDataset, DataLoader
 import numpy as np
-from Models.ts2vec.models.encoder import TSEncoder
-from Models.ts2vec.models.losses import hierarchical_contrastive_loss
-from Models.ts2vec.utils import take_per_row, split_with_nan, centerize_vary_length_series, torch_pad_nan
+from FDEDiff.Models.ts2vec.models.encoder import TSEncoder
+from FDEDiff.Models.ts2vec.models.losses import hierarchical_contrastive_loss
+from FDEDiff.Models.ts2vec.utils import take_per_row, split_with_nan, centerize_vary_length_series, torch_pad_nan
 
 
 class TS2Vec:

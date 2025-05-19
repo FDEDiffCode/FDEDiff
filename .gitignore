@@ -1,0 +1,13 @@
+**/__pycache__/
+__pycache__/
+data/*
+results/*
+experiments/*
+*.ipynb
+*.txt
+config/*
+bash_script/*
+*.mp4
+evaluation_results/*
+# script/*
+.history/*

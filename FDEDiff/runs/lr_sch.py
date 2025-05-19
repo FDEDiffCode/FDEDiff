@@ -11,7 +11,8 @@ class WarmUpSch:
         patience = 20,
         factor = 0.5,
         min_lr = 1e-6,
-        threshold = 1e-1
+        threshold = 1e-1,
+        warmup_ratio = None
     ):
         self.opt = opt
         self.warmup_steps = warmup_steps

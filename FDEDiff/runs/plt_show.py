@@ -8,7 +8,6 @@ def plot_loss_curve(all_loss, n_epochs, log_dir):
     :param n_epochs: 总训练轮次
     :param log_dir: 日志目录，保存图像文件
     """
-    # 绘制所有损失曲线
     plt.figure()
     plt.plot(range(n_epochs), all_loss, label='Train Loss')
     plt.xlabel('Epoch')
@@ -18,7 +17,6 @@ def plot_loss_curve(all_loss, n_epochs, log_dir):
     plt.savefig(os.path.join(log_dir, 'loss_curve.png'))
     plt.close()
 
-    # 绘制最后 1/4 部分的损失曲线
     start_idx = int(n_epochs * 3 / 4)
     end_idx = n_epochs
     loss_last_quarter = all_loss[start_idx:end_idx]

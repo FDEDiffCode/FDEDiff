@@ -42,23 +42,6 @@ python main.py \
     --config 'path of your config file' 
 ```
 
-## 【TODO】Citation
-
-> 🙋 Please let us know if you find out a mistake or have any suggestions!
-
-> 🌟 If you find the Time-MoE models helpful in your research, please consider to star this repository and cite the
-> corresponding [paper]():
-
-```
-
-```
-
-## 【TODO】Related Resources 
-
-* Towards Neural Scaling Laws for Time Series Foundation Models, arXiv 2024. [\[paper\]](https://arxiv.org/pdf/2410.12360)
-* Transformers in Time Series: A Survey, in *IJCAI*
-  1.    [\[paper\]](https://arxiv.org/abs/2202.07125) [\[GitHub Repo\]](https://github.com/qingsongedu/time-series-transformers-review)
-
 ## Acknowledgement
 
 We appreciate the following GitHub repos a lot for their valuable code and efforts.

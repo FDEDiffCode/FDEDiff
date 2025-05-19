@@ -4,13 +4,12 @@ import torch.nn.functional as F
 
 from tqdm import tqdm
 
-from Models.ddpm.utils import (
+from FDEDiff.Models.ddpm.utils import (
     linear_beta_schedule, 
     cosine_beta_schedule,
     calculate_ba_parameters,
     extract
 ) 
-
 
 class Diffusion(nn.Module):
     def __init__(
@@ -18,7 +17,9 @@ class Diffusion(nn.Module):
         step_predictor,
         timesteps = 1000,
         beta_schedule = 'cosine',
-        predict_target = 'eps'
+        predict_target = 'eps',
+        loss_type = 'mse',
+        log_flag = False
     ):
         super(Diffusion, self).__init__()
         self.model = step_predictor
@@ -36,6 +37,8 @@ class Diffusion(nn.Module):
             register_buffer(name, val)
         self.loss_fn = F.mse_loss
         self.predict_target = predict_target
+        self.loss_type = loss_type
+        self.log_flag = log_flag
     
     def get_noise_given_x0_xt(self, x0, xt, t):
         # noise = (xt - sqrt(alpha_cum) * x0) / sqrt(1 - alpha_cum)
@@ -65,11 +68,14 @@ class Diffusion(nn.Module):
             extract(self.sqrt_one_minus_alphas_cumprod, t, xt.shape) * xt
         )
     
-    def p_xprev_given_xt(self, xt, t):
+    def p_xprev_given_xt(self, xt, t, cond=None):
         batched_t = torch.full((xt.shape[0],), t, device=xt.device, dtype=torch.long)
         noise = torch.randn_like(xt) if t > 0 else 0.
         log_std = extract(self.posterior_log_variance_clipped, batched_t, xt.shape)
-        output = self.model(xt, batched_t)
+        if cond == None:
+            output = self.model(xt, batched_t)
+        else :
+            output = self.model(xt, batched_t, cond)
         if self.predict_target == 'x0':
             return (
                 extract(self.posterior_q_mean_x0, batched_t, xt.shape) * output +
@@ -83,7 +89,13 @@ class Diffusion(nn.Module):
             extract(self.posterior_p_mean_noise, batched_t, xt.shape) * output +
             (0.5 * log_std).exp() * noise
         )
+    def fft_loss(self, input, target):
+        input_fft = torch.fft.fft(input)
+        target_fft = torch.fft.fft(target)
 
+        loss = F.mse_loss(input_fft.real, target_fft.real) + F.mse_loss(input_fft.imag, target_fft.imag)
+        return loss
+    
     def p_loss(self, x0, t, noise, cond=None):
         xt = self.q_xt_given_x0(x0, t, noise)
         if cond == None:
@@ -99,13 +111,19 @@ class Diffusion(nn.Module):
         else:
             raise NotImplementedError(f'DDPM predict target: {self.predict_target} not supported!')
         loss = self.loss_fn(output, target)
+        if self.loss_type == 'fft':
+            loss += self.fft_loss(output, target)
+            if self.log_flag:
+                print(f'[LOSS DEBUG] FSE: {self.loss_fn(output, target)} FFT: {self.fft_loss(output, target)}')
         return loss
 
-    def sample(self, shape):
+    def sample(self, shape, cond=None):
         device = self.betas.device
         xt = torch.randn(shape, device=device)
         for t in reversed(range(0, self.num_timesteps)):
-            xt = self.p_xprev_given_xt(xt, t)
+            if cond == None:
+                xt = self.p_xprev_given_xt(xt, t)
+            else : xt = self.p_xprev_given_xt(xt, t, cond)
         return xt
 
     def forward(self, x0, cond=None):
@@ -145,12 +163,15 @@ class Diffusion(nn.Module):
         now = 0
         B = x_shape[0]
         xt = torch.randn(size=x_shape, device=self.betas.device)
+        save_batch_mts(xt, save_dir, now)
         for i in tqdm(reversed(range(0, self.num_timesteps))):
             xt = self.p_xprev_given_xt(xt, i)
+            # xt = torch.clamp(xt, min=-1.0, max=1.0)
             now += 1
             if now % step == 0 or i <= T:
                 save_batch_mts(xt, save_dir, now)
         
     def test_one_batch(self, test_batch, test_save_folder, device, epoch):
+        return 
         self.debug_back(test_batch.shape, 50, test_save_folder, 50)
         # pass

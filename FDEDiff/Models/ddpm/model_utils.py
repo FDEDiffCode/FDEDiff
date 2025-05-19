@@ -4,7 +4,6 @@ import torch.nn.functional as F
 
 import math
 
-
 class FixedTimeEmbeddings(nn.Module):
     def __init__(
         self,

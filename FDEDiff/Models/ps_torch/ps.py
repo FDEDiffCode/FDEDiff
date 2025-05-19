@@ -20,7 +20,6 @@ class GRUNetwork(nn.Module):
         out = self.fc(out)
         return self.ac(out)
 
-
 def eval_ps(ori_data, gen_data, device, n_epochs):
     N, L, D = ori_data.shape
     batch_size = 16
